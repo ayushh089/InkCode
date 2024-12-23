@@ -4,7 +4,6 @@ import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import Editor from "../Components/editor/Editor";
-import { User } from "lucide-react";
 const defCode = `console.log("Hello World!");`;
 const UserContext = createContext();
 export function Layout() {
@@ -13,7 +12,7 @@ export function Layout() {
   const [outputDetails, setOutputDetails] = useState(null);
   const [processing, setProcessing] = useState(false);
 
-  const REACT_APP_RAPID_API_URL = 
+  const REACT_APP_RAPID_API_URL =
     "https://judge0-ce.p.rapidapi.com/submissions";
   const REACT_APP_RAPID_API_HOST = "judge0-ce.p.rapidapi.com";
   const REACT_APP_RAPID_API_KEY =

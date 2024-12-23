@@ -14,7 +14,7 @@ const RunCode = ({}) => {
     handleCompile,
   } = useContext(UserContext);  
   return (
-    <div className="p-4 bg-slate-800  flex flex-col">
+    <div className="p-4 bg-slate-800 ">
       <InputArea customInput={customInput} setCustomInput={setCustomInput} />
       <button
         onClick={handleCompile}

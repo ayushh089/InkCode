@@ -1,11 +1,18 @@
-import { Layout } from "./pages/layout";
+import React from 'react';
+import { BrowserRouter as Router, Route, Routes } from 'react-router-dom';
+import LandingPage from './Components/LandingPage';
+import { Layout } from './pages/layout';
 
-function App() {
+const App = () => {
   return (
-    <>
-      <Layout />
-    </>
+    <Router>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+        <Route path="/editor/:roomId" element={<Layout />} />
+      </Routes>
+    </Router>
   );
-}
+};
 
 export default App;
+
