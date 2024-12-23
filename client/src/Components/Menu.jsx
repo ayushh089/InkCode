@@ -1,85 +1,78 @@
-import React, { useState } from "react";
-import { Files, Link, Play, Settings, LayoutGrid, Camera } from 'lucide-react';
+import React, { useState, useContext } from "react";
+import { Files, Link, Play, Settings, LayoutGrid, Camera } from "lucide-react";
 import RunCode from "./Run_Code/RunCode";
-
-const menuItems = [
-  {
-    icon: Files,
-    label: "Files",
-    content: (
-      <div className="p-4">
-        <div className="mb-4">
-          <div className="flex items-center space-x-2 p-2 bg-[#2d2d2d] rounded">
-            <span className="text-yellow-500">JS</span>
-            <span className="text-white">index.js</span>
-          </div>
+import FileManager from "./FileManager/FileManager";
+import { UserContext } from "../pages/layout";
+export function Menu() {
+  const {
+    code,
+    setCode,
+    setCustomInput,
+    customInput,
+    outputDetails,
+    processing,
+    handleCompile,
+  } = useContext(UserContext);
+  const menuItems = [
+    {
+      icon: Files,
+      label: "Files",
+      content: <FileManager />,
+    },
+    {
+      icon: Play,
+      label: "Run Code",
+      content: (
+        <RunCode
+          handleCompile={handleCompile}
+          customInput={customInput}
+          setCustomInput={setCustomInput}
+          outputDetails={outputDetails}
+          processing={processing}
+        />
+      ),
+    },
+    {
+      icon: Link,
+      label: "Connections",
+      content: (
+        <div className="p-4">
+          <h2 className="text-white text-lg mb-4">Connections</h2>
+          <div className="text-gray-300">Configure your connections here</div>
         </div>
-        <div className="space-y-2">
-          <button className="w-full text-left p-2 text-white hover:bg-[#2d2d2d] rounded">
-            New File
-          </button>
-          <button className="w-full text-left p-2 text-white hover:bg-[#2d2d2d] rounded">
-            Open File
-          </button>
-          <button className="w-full text-left p-2 text-white hover:bg-[#2d2d2d] rounded">
-            Download File
-          </button>
-          <button className="w-full text-left p-2 text-white hover:bg-[#2d2d2d] rounded">
-            Download All Files
-          </button>
+      ),
+    },
+    {
+      icon: Settings,
+      label: "Settings",
+      content: (
+        <div className="p-4">
+          <h2 className="text-white text-lg mb-4">Settings</h2>
+          <div className="text-gray-300">Adjust your settings here</div>
         </div>
-      </div>
-    ),
-  },
-  {
-    icon: Play,
-    label: "Run Code",
-    content: null, // We'll render this separately
-  },
-  { 
-    icon: Link, 
-    label: "Connections",
-    content: (
-      <div className="p-4">
-        <h2 className="text-white text-lg mb-4">Connections</h2>
-        <div className="text-gray-300">Configure your connections here</div>
-      </div>
-    )
-  },
-  { 
-    icon: Settings, 
-    label: "Settings",
-    content: (
-      <div className="p-4">
-        <h2 className="text-white text-lg mb-4">Settings</h2>
-        <div className="text-gray-300">Adjust your settings here</div>
-      </div>
-    )
-  },
-  { 
-    icon: LayoutGrid, 
-    label: "Canvas",
-    content: (
-      <div className="p-4">
-        <h2 className="text-white text-lg mb-4">Canvas</h2>
-        <div className="text-gray-300">Canvas options will appear here</div>
-      </div>
-    )
-  },
-  { 
-    icon: Camera, 
-    label: "Camera",
-    content: (
-      <div className="p-4">
-        <h2 className="text-white text-lg mb-4">Camera</h2>
-        <div className="text-gray-300">Camera controls will appear here</div>
-      </div>
-    )
-  }
-];
-
-export function Menu({ handleCompile, customInput, setCustomInput, outputDetails, processing }) {
-  
+      ),
+    },
+    {
+      icon: LayoutGrid,
+      label: "Canvas",
+      content: (
+        <div className="p-4">
+          <h2 className="text-white text-lg mb-4">Canvas</h2>
+          <div className="text-gray-300">Canvas options will appear here</div>
+        </div>
+      ),
+    },
+    {
+      icon: Camera,
+      label: "Camera",
+      content: (
+        <div className="p-4">
+          <h2 className="text-white text-lg mb-4">Camera</h2>
+          <div className="text-gray-300">Camera controls will appear here</div>
+        </div>
+      ),
+    },
+  ];
   const [activePanel, setActivePanel] = useState(null);
 
   const handleMenuClick = (item) => {
@@ -113,22 +106,10 @@ export function Menu({ handleCompile, customInput, setCustomInput, outputDetails
             <span className="text-white font-medium">
               {menuItems.find((item) => item.label === activePanel)?.label}
             </span>
-       
           </div>
-          {activePanel === "Run Code" ? (
-            <RunCode 
-              handleCompile={handleCompile}
-              customInput={customInput}
-              setCustomInput={setCustomInput}
-              outputDetails={outputDetails}
-              processing={processing}
-            />
-          ) : (
-            menuItems.find((item) => item.label === activePanel)?.content
-          )}
+          {menuItems.find((item) => item.label === activePanel)?.content}
         </div>
       )}
     </div>
   );
 }
-

@@ -1,12 +1,12 @@
-import React, { useState } from "react";
+import React, { createContext, useContext, useState } from "react";
 import { Menu } from "../Components/Menu";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import Editor from "../Components/editor/Editor";
-
+import { User } from "lucide-react";
 const javascriptDefault = `console.log("Hello World!");`;
-
+const UserContext = createContext();
 export function Layout() {
   const [code, setCode] = useState(javascriptDefault);
   const [customInput, setCustomInput] = useState("");
@@ -25,7 +25,7 @@ export function Layout() {
     }
   };
 
-    const handleCompile = () => {
+  const handleCompile = () => {
     console.log("handleCompile");
 
     setProcessing(true);
@@ -120,20 +120,33 @@ export function Layout() {
   };
 
   return (
-    <div className="flex h-screen bg-gray-100">
-      <Menu
-        handleCompile={handleCompile}
-        customInput={customInput}
-        setCustomInput={setCustomInput}
-        outputDetails={outputDetails}
-        processing={processing}
-      />
-      <div className="flex-1 flex flex-col overflow-hidden">
-        <main className="flex-1 ">
-          <Editor onChange={onChange} code={code} />
-        </main>
+    <UserContext.Provider
+      value={{
+        code,
+        setCode,
+        setCustomInput,
+        customInput,
+        outputDetails,
+        processing,
+        handleCompile
+      }}
+    >
+      <div className="flex h-screen bg-gray-100">
+        <Menu
+          handleCompile={handleCompile}
+          customInput={customInput}
+          setCustomInput={setCustomInput}
+          outputDetails={outputDetails}
+          processing={processing}
+        />
+        <div className="flex-1 flex flex-col overflow-hidden">
+          <main className="flex-1 ">
+            <Editor onChange={onChange} code={code} />
+          </main>
+        </div>
+        <ToastContainer />
       </div>
-      <ToastContainer />
-    </div>
+    </UserContext.Provider>
   );
 }
+export  {UserContext};

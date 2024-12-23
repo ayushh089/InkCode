@@ -1,15 +1,18 @@
-import React from "react";
+import React, { useContext } from "react";
 import { Play, Loader } from "lucide-react";
 import InputArea from "../input/InputArea";
 import OutputArea from "../output/OutputArea";
-
-const RunCode = ({
-  handleCompile,
-  customInput,
-  setCustomInput,
-  outputDetails,
-  processing,
-}) => {
+import { UserContext } from "../../pages/layout";
+const RunCode = ({}) => {
+  const {
+    code,
+    setCode,
+    setCustomInput,
+    customInput,
+    outputDetails,
+    processing,
+    handleCompile,
+  } = useContext(UserContext);  
   return (
     <div className="p-4 bg-slate-800  flex flex-col">
       <InputArea customInput={customInput} setCustomInput={setCustomInput} />
@@ -32,9 +35,7 @@ const RunCode = ({
           </>
         )}
       </button>
-      <OutputArea
-        outputDetails={outputDetails}
-      />
+      <OutputArea outputDetails={outputDetails} />
     </div>
   );
 };
