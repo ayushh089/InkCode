@@ -5,19 +5,20 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import Editor from "../Components/editor/Editor";
 import { User } from "lucide-react";
-const javascriptDefault = `console.log("Hello World!");`;
+const defCode = `console.log("Hello World!");`;
 const UserContext = createContext();
 export function Layout() {
-  const [code, setCode] = useState(javascriptDefault);
+  const [code, setCode] = useState(defCode);
   const [customInput, setCustomInput] = useState("");
   const [outputDetails, setOutputDetails] = useState(null);
   const [processing, setProcessing] = useState(false);
 
-  const REACT_APP_RAPID_API_URL =
+  const REACT_APP_RAPID_API_URL = 
     "https://judge0-ce.p.rapidapi.com/submissions";
   const REACT_APP_RAPID_API_HOST = "judge0-ce.p.rapidapi.com";
   const REACT_APP_RAPID_API_KEY =
-    "adc5cb09e3mshe2020c9ea40bd56p16e377jsn0da7994f0a20";
+    // "adc5cb09e3mshe2020c9ea40bd56p16e377jsn0da7994f0a20";
+    "768d1ec78cmsh4b7da427f8c8bf9p12acf2jsn1c9ef9438ca5";
 
   const onChange = (action, data) => {
     if (action === "code") {
@@ -128,17 +129,11 @@ export function Layout() {
         customInput,
         outputDetails,
         processing,
-        handleCompile
+        handleCompile,
       }}
     >
       <div className="flex h-screen bg-gray-100">
-        <Menu
-          handleCompile={handleCompile}
-          customInput={customInput}
-          setCustomInput={setCustomInput}
-          outputDetails={outputDetails}
-          processing={processing}
-        />
+        <Menu />
         <div className="flex-1 flex flex-col overflow-hidden">
           <main className="flex-1 ">
             <Editor onChange={onChange} code={code} />
@@ -149,4 +144,4 @@ export function Layout() {
     </UserContext.Provider>
   );
 }
-export  {UserContext};
+export { UserContext };
