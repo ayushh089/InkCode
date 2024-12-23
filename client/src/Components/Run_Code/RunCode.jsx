@@ -11,7 +11,7 @@ const RunCode = ({
   processing,
 }) => {
   return (
-    <div className="p-4 bg-slate-800 h-full flex flex-col">
+    <div className="p-4 bg-slate-800  flex flex-col">
       <InputArea customInput={customInput} setCustomInput={setCustomInput} />
       <button
         onClick={handleCompile}
@@ -33,7 +33,7 @@ const RunCode = ({
         )}
       </button>
       <OutputArea
-        output={outputDetails?.stdout ? atob(outputDetails.stdout) : null}
+        outputDetails={outputDetails}
       />
     </div>
   );

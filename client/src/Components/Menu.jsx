@@ -79,7 +79,6 @@ const menuItems = [
 ];
 
 export function Menu({ handleCompile, customInput, setCustomInput, outputDetails, processing }) {
-  // console.log("in menu"+atob(outputDetails.stdout));
   
   const [activePanel, setActivePanel] = useState(null);
 
@@ -88,15 +87,15 @@ export function Menu({ handleCompile, customInput, setCustomInput, outputDetails
   };
 
   return (
-    <div className="flex h-full">
+    <div className="flex w-full md:h-full md:max-h-full md:min-h-full md:w-auto">
       {/* Sidebar */}
-      <div className="w-16 bg-[#1e1e1e] border-r border-gray-800">
-        <nav className="flex flex-col py-4">
+      <div className="w-16 bg-slate-800 border-r border-gray-800 ">
+        <nav className="flex flex-col ">
           {menuItems.map((item) => (
             <button
               key={item.label}
               onClick={() => handleMenuClick(item)}
-              className={`p-3 hover:bg-[#2d2d2d] transition-colors ${
+              className={`p-3 hover:bg-slate-600 transition-colors ${
                 activePanel === item.label ? "bg-[#2d2d2d]" : ""
               }`}
               title={item.label}
@@ -109,17 +108,12 @@ export function Menu({ handleCompile, customInput, setCustomInput, outputDetails
 
       {/* Panel */}
       {activePanel && (
-        <div className="w-64 bg-slate-800 border-r border-gray-800 animate-slide-in">
+        <div className="w-72 bg-slate-800 border-l-2 border-r-4 border-r-slate-200 border-l-slate-600 animate-slide-in">
           <div className="flex items-center justify-between p-3 border-b border-gray-700">
             <span className="text-white font-medium">
               {menuItems.find((item) => item.label === activePanel)?.label}
             </span>
-            <button
-              onClick={() => setActivePanel(null)}
-              className="text-gray-400 hover:text-white"
-            >
-              ✕
-            </button>
+       
           </div>
           {activePanel === "Run Code" ? (
             <RunCode 

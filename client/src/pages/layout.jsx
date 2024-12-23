@@ -5,7 +5,7 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import Editor from "../Components/editor/Editor";
 
-const javascriptDefault = `// Your default code here`;
+const javascriptDefault = `console.log("Hello World!");`;
 
 export function Layout() {
   const [code, setCode] = useState(javascriptDefault);
@@ -25,7 +25,7 @@ export function Layout() {
     }
   };
 
-  const handleCompile = () => {
+    const handleCompile = () => {
     console.log("handleCompile");
 
     setProcessing(true);
