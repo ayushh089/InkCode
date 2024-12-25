@@ -1,8 +1,9 @@
 import React, { useState, useContext } from "react";
-import { Files, Link, Play, Settings, LayoutGrid, Camera } from "lucide-react";
+import { Files, Play, Settings, LayoutGrid, Camera, Users } from "lucide-react";
 import RunCode from "./Run_Code/RunCode";
 import FileManager from "./FileManager/FileManager";
 import { UserContext } from "../pages/layout";
+import ConnectionList from "./Connections/ConnectionList";
 export function Menu() {
   const {
     code,
@@ -12,6 +13,7 @@ export function Menu() {
     outputDetails,
     processing,
     handleCompile,
+    connectedUsers,
   } = useContext(UserContext);
   const menuItems = [
     {
@@ -22,25 +24,12 @@ export function Menu() {
     {
       icon: Play,
       label: "Run Code",
-      content: (
-        <RunCode
-          handleCompile={handleCompile}
-          customInput={customInput}
-          setCustomInput={setCustomInput}
-          outputDetails={outputDetails}
-          processing={processing}
-        />
-      ),
+      content: <RunCode />,
     },
     {
-      icon: Link,
+      icon: Users,
       label: "Connections",
-      content: (
-        <div className="p-4">
-          <h2 className="text-white text-lg mb-4">Connections</h2>
-          <div className="text-gray-300">Configure your connections here</div>
-        </div>
-      ),
+      content: <ConnectionList />,
     },
     {
       icon: Settings,

@@ -1,9 +1,9 @@
-import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import React, { useState } from "react";
+import { useNavigate } from "react-router-dom";
 
 const LandingPage = () => {
-  const [roomId, setRoomId] = useState('');
-  const [name, setName] = useState('');
+  const [roomId, setRoomId] = useState("");
+  const [username, setUsername] = useState("");
   const navigate = useNavigate();
 
   const createRoom = () => {
@@ -13,17 +13,20 @@ const LandingPage = () => {
 
   const joinRoom = (e) => {
     e.preventDefault();
-    if (roomId.trim()) {
-      navigate(`/editor/${roomId}`);
+    if (roomId.trim() && username.trim()) {
+      navigate(`/editor/${roomId}`, { state: { username } });
+    } else {
+      alert("Please enter both a room ID and a username");
     }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <div className="p-8 bg-white rounded-lg shadow-md w-96">
-        <h1 className="text-2xl font-bold mb-6 text-center">Code Collaboration</h1>
+        <h1 className="text-2xl font-bold mb-6 text-center">
+          Collaborative Code Editor
+        </h1>
         <div className="space-y-4">
-      
           <form onSubmit={joinRoom} className="space-y-2">
             <input
               type="text"
@@ -34,9 +37,9 @@ const LandingPage = () => {
             />
             <input
               type="text"
-              value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="Enter your Name"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              placeholder="Enter your username"
               className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button
@@ -46,8 +49,11 @@ const LandingPage = () => {
               Join Room
             </button>
           </form>
-          <div className='text-center text-blue-500 text-lg font-bold cursor-pointer' onClick={createRoom}>
-            Generate a new Room ID
+          <div
+            onClick={createRoom}
+            className="  text-blue-500 text-center cursor-pointer hover:underline"
+          >
+            Create New Room
           </div>
         </div>
       </div>
@@ -56,4 +62,3 @@ const LandingPage = () => {
 };
 
 export default LandingPage;
-
