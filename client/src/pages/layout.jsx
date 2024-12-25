@@ -15,7 +15,7 @@ const socket = io("http://localhost:3000");
 export function Layout() {
   const { roomId } = useParams();
   const location = useLocation();
-  const username = location.state?.username || "Anonymous";
+  const username = location.state?.username || "Anjan";
 
   const [code, setCode] = useState(defCode);
   const [customInput, setCustomInput] = useState("");
@@ -23,11 +23,6 @@ export function Layout() {
   const [processing, setProcessing] = useState(false);
   const [connectedUsers, setConnectedUsers] = useState([]);
 
-  const REACT_APP_RAPID_API_URL =
-    "https://judge0-ce.p.rapidapi.com/submissions";
-  const REACT_APP_RAPID_API_HOST = "judge0-ce.p.rapidapi.com";
-  const REACT_APP_RAPID_API_KEY =
-    "768d1ec78cmsh4b7da427f8c8bf9p12acf2jsn1c9ef9438ca5";
 
   useEffect(() => {
     socket.emit("joinRoom", { roomId, username });
@@ -73,12 +68,12 @@ export function Layout() {
 
     const options = {
       method: "POST",
-      url: REACT_APP_RAPID_API_URL,
+      url: import.meta.env.VITE_RAPID_API_URL,
       params: { base64_encoded: "true", fields: "*" },
       headers: {
         "content-type": "application/json",
-        "X-RapidAPI-Host": REACT_APP_RAPID_API_HOST,
-        "X-RapidAPI-Key": REACT_APP_RAPID_API_KEY,
+        "X-RapidAPI-Host": import.meta.env.VITE_RAPID_API_HOST,
+        "X-RapidAPI-Key": import.meta.env.VITE_RAPID_API_KEY,
       },
       data: formData,
     };
@@ -102,11 +97,11 @@ export function Layout() {
   const checkStatus = async (token) => {
     const options = {
       method: "GET",
-      url: `${REACT_APP_RAPID_API_URL}/${token}`,
+      url: `${import.meta.env.VITE_RAPID_API_URL}/${token}`,
       params: { base64_encoded: "true", fields: "*" },
       headers: {
-        "X-RapidAPI-Host": REACT_APP_RAPID_API_HOST,
-        "X-RapidAPI-Key": REACT_APP_RAPID_API_KEY,
+        "X-RapidAPI-Host": import.meta.env.VITE_RAPID_API_HOST,
+        "X-RapidAPI-Key": import.meta.env.VITE_RAPID_API_KEY,
       },
     };
     try {
