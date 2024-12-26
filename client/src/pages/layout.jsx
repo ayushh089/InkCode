@@ -7,7 +7,6 @@ import axios from "axios";
 import Editor from "../Components/editor/Editor";
 import io from "socket.io-client";
 const UserContext = createContext();
-
 const defCode = `console.log("Hello World!");`;
 
 const socket = io("http://localhost:3000");
@@ -23,10 +22,8 @@ export function Layout() {
   const [processing, setProcessing] = useState(false);
   const [connectedUsers, setConnectedUsers] = useState([]);
 
-
   useEffect(() => {
     socket.emit("joinRoom", { roomId, username });
-
     socket.on("updateConnectedUsers", (users) => {
       setConnectedUsers(users);
     });
@@ -61,7 +58,7 @@ export function Layout() {
 
     setProcessing(true);
     const formData = {
-      language_id: 76, // JavaScript (Node.js 12.14.0)
+      language_id: 63, // JavaScript (Node.js 12.14.0)
       source_code: btoa(code),
       stdin: btoa(customInput),
     };
@@ -90,7 +87,7 @@ export function Layout() {
         let error = err.response ? err.response.data : err;
         setProcessing(false);
         console.log("catch block...", error);
-        showErrorToast();
+        showErrorToast(error.source_code[0]);
       });
   };
 
@@ -117,17 +114,23 @@ export function Layout() {
         setProcessing(false);
         setOutputDetails(response.data);
         console.log("response.data", response.data);
-        showSuccessToast();
+        let status_desc = response.data?.status?.description;
+        let status_id = response.data?.status?.id;
+        if (status_id === 3) {
+          showSuccessToast(status_desc);
+        } else {
+          showErrorToast(status_desc);
+        }
       }
     } catch (err) {
       console.log("err", err);
       setProcessing(false);
-      showErrorToast();
+      showErrorToast(err);
     }
   };
 
-  const showSuccessToast = () => {
-    toast.success("Compiled Successfully!", {
+  const showSuccessToast = (msg) => {
+    toast.success(msg, {
       position: "top-right",
       autoClose: 1000,
       hideProgressBar: false,
@@ -138,8 +141,8 @@ export function Layout() {
     });
   };
 
-  const showErrorToast = () => {
-    toast.error("Something went wrong! Please try again.", {
+  const showErrorToast = (msg) => {
+    toast.error(msg, {
       position: "top-right",
       autoClose: 1000,
       hideProgressBar: false,

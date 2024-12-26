@@ -13,15 +13,16 @@ const ConnectionList = () => {
         {connectedUsers.map((user, index) => (
           <div
             key={index}
-            className="flex items-center justify-between p-3 bg-gray-700 rounded-lg shadow-md hover:bg-gray-600 transition duration-200"
+            className="flex items-center  p-3 bg-gray-700 rounded-lg shadow-md hover:bg-gray-600 transition duration-200"
           >
+            <div className="mr-3 ">
+              <img
+                src={`https://ui-avatars.com/api/?name=${user}&background=random&length=1&unique=${index}`}
+                alt="Ayush Gupta Avatar"
+                className="rounded-full w-8 h-8"
+              />
+            </div>
             <div className="text-white font-medium">{user}</div>
-            <button
-              className="text-blue-500 hover:text-blue-300 transition duration-200"
-              onClick={() => alert(`Send a message to ${user}`)} // Add your desired action here
-            >
-              <i className="fas fa-comment-alt"></i> {/* Font Awesome Icon for message */}
-            </button>
           </div>
         ))}
       </div>
@@ -30,3 +31,6 @@ const ConnectionList = () => {
 };
 
 export default ConnectionList;
+
+// Avatars generated using UI Avatars: https://ui-avatars.com/
+//Thanks for this free API

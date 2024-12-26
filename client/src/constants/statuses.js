@@ -1,4 +1,4 @@
-export const statuses = [
+export const statusList = [
   {
     id: 1,
     description: "In Queue",

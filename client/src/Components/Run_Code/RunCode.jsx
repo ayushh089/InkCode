@@ -5,14 +5,12 @@ import OutputArea from "../output/OutputArea";
 import { UserContext } from "../../pages/layout";
 const RunCode = ({}) => {
   const {
-    code,
-    setCode,
     setCustomInput,
     customInput,
     outputDetails,
     processing,
     handleCompile,
-  } = useContext(UserContext);  
+  } = useContext(UserContext);
   return (
     <div className="p-4 bg-slate-800 ">
       <InputArea customInput={customInput} setCustomInput={setCustomInput} />
