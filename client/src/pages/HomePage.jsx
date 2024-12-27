@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useRef } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { Menu } from "../Components/Menu";
 import { ToastContainer, toast } from "react-toastify";
@@ -6,12 +6,11 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import Editor from "../Components/editor/Editor";
 import io from "socket.io-client";
+
 const UserContext = createContext();
 const defCode = `console.log("Hello World!");`;
 
-const socket = io("http://localhost:3000");
-
-export function Layout() {
+export function HomePage() {
   const { roomId } = useParams();
   const location = useLocation();
   const username = location.state?.username || "Anjan";
@@ -21,37 +20,56 @@ export function Layout() {
   const [outputDetails, setOutputDetails] = useState(null);
   const [processing, setProcessing] = useState(false);
   const [connectedUsers, setConnectedUsers] = useState([]);
+  const [messages, setMessages] = useState([]);
+  const socketRef = useRef(null);
 
   useEffect(() => {
-    socket.emit("joinRoom", { roomId, username });
-    socket.on("updateConnectedUsers", (users) => {
+    socketRef.current = io("http://localhost:3000");
+
+    socketRef.current.emit("joinRoom", { roomId, username });
+
+    socketRef.current.on("updateConnectedUsers", (users) => {
       setConnectedUsers(users);
     });
 
-    return () => {
-      socket.emit("leaveRoom", { roomId, username });
-      socket.off("updateConnectedUsers");
-    };
-  }, [roomId, username]);
+    socketRef.current.on("ToastJoined", (joinedUsername) => {
+      showSuccessToast(`${joinedUsername} has joined the room!`);
+    });
+    socketRef.current.on("userLeft", (joinedUsername) => {
+      showErrorToast(`${joinedUsername} has left the room!`);
+    });
 
-  const handleCodeChange = (key, value) => {
-    if (key === "code") {
-      setCode(value);
-      socket.emit("codeChange", { roomId, code: value });
-    }
-  };
-
-  useEffect(() => {
-    socket.on("codeChange", (updatedCode) => {
+    socketRef.current.on("codeChange", (updatedCode) => {
       if (updatedCode !== code) {
         setCode(updatedCode);
       }
     });
+    socketRef.current.on("receiveMessage", ({ msg, username, time }) => {
+      setMessages(prevMessages => [...prevMessages, { msg, username, time }]);
+    });
 
     return () => {
-      socket.off("codeChange");
+      if (socketRef.current) {
+        socketRef.current.emit("leaveRoom", { roomId, username });
+        socketRef.current.disconnect();
+      }
     };
-  }, [code]);
+  }, []);//ek he baar chlega
+
+  const handleCodeChange = (key, value) => {
+    if (key === "code") {
+      setCode(value);
+      socketRef.current.emit("codeChange", { roomId, code: value });
+    }
+  };
+  const sendMessage = (msg) => {
+    if (socketRef.current) {
+      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      socketRef.current.emit("sendMessage", { msg, roomId, username, time });
+      setMessages(prevMessages => [...prevMessages, { msg, username, time }]);
+    }
+  };
+
 
   const handleCompile = () => {
     console.log("handleCompile");
@@ -164,6 +182,10 @@ export function Layout() {
         processing,
         handleCompile,
         connectedUsers,
+        socket: socketRef.current,
+        messages,
+        sendMessage,
+        username,
       }}
     >
       <div className="flex h-screen bg-gray-100">

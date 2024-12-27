@@ -1,9 +1,17 @@
-import React, { useState, useContext } from "react";
-import { Files, Play, Settings, LayoutGrid, Camera, Users } from 'lucide-react';
+import React, { useState, useContext, useRef, useEffect } from "react";
+import {
+  Files,
+  Play,
+  Settings,
+  Camera,
+  Users,
+  MessageCircleMore,
+} from "lucide-react";
 import RunCode from "./Run_Code/RunCode";
 import FileManager from "./FileManager/FileManager";
-import { UserContext } from "../pages/layout";
+import { UserContext } from "../pages/HomePage";
 import ConnectionList from "./Connections/ConnectionList";
+import Chat from "./Chat/Chat";
 
 export function Menu() {
   const {
@@ -15,6 +23,10 @@ export function Menu() {
     processing,
     handleCompile,
     connectedUsers,
+    socket,
+    messages,
+    sendMessage,
+    username,
   } = useContext(UserContext);
 
   const menuItems = [
@@ -44,16 +56,6 @@ export function Menu() {
       ),
     },
     {
-      icon: LayoutGrid,
-      label: "Canvas",
-      content: (
-        <div className="p-4">
-          <h2 className="text-white text-lg mb-4">Canvas</h2>
-          <div className="text-gray-300">Canvas options will appear here</div>
-        </div>
-      ),
-    },
-    {
       icon: Camera,
       label: "Camera",
       content: (
@@ -61,6 +63,17 @@ export function Menu() {
           <h2 className="text-white text-lg mb-4">Camera</h2>
           <div className="text-gray-300">Camera controls will appear here</div>
         </div>
+      ),
+    },
+    {
+      icon: MessageCircleMore,
+      label: "Chat",
+      content: (
+        <Chat
+          messages={messages}
+          sendMessage={sendMessage}
+          username={username}
+        />
       ),
     },
   ];
@@ -93,7 +106,7 @@ export function Menu() {
 
       {/* Panel */}
       {activePanel && (
-        <div className="w-72 bg-slate-800 border-l-2 border-r-4 border-r-slate-200 border-l-slate-600 animate-slide-in h-full flex flex-col">
+        <div className="w-80 bg-slate-800 border-l-2 border-r-4 border-r-slate-200 border-l-slate-600 animate-slide-in h-full flex flex-col">
           <div className="flex items-center justify-between p-3 border-b border-gray-700">
             <span className="text-white font-medium">
               {menuItems.find((item) => item.label === activePanel)?.label}
@@ -107,4 +120,3 @@ export function Menu() {
     </div>
   );
 }
-

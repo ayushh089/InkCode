@@ -1,11 +1,11 @@
 import React, { useContext } from "react";
-import { UserContext } from "../../pages/layout";
+import { UserContext } from "../../pages/HomePage";
 
 const ConnectionList = () => {
   const { connectedUsers } = useContext(UserContext);
 
   return (
-    <div className="p-4 bg-gray-800 rounded-lg shadow- h-screen">
+    <div className="p-4 bg-gray-800 rounded-lg shadow- h-full">
       <h2 className="text-white text-xl font-semibold mb-4">
         Connected Users: {connectedUsers.length}
       </h2>

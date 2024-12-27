@@ -2,7 +2,7 @@ import React, { useContext } from "react";
 import { Play, Loader } from "lucide-react";
 import InputArea from "../input/InputArea";
 import OutputArea from "../output/OutputArea";
-import { UserContext } from "../../pages/layout";
+import { UserContext } from "../../pages/HomePage";
 const RunCode = ({}) => {
   const {
     setCustomInput,
