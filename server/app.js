@@ -24,9 +24,12 @@ io.on("connection", (socket) => {
     }
     rooms.get(roomId).set(socket.id, username);
     console.log(`User ${username} joined room ${roomId}`);
-  
+
     // Notify all users in the room, including the one who just joined
-    io.to(roomId).emit("updateConnectedUsers", Array.from(rooms.get(roomId).values()));
+    io.to(roomId).emit(
+      "updateConnectedUsers",
+      Array.from(rooms.get(roomId).values())
+    );
     socket.to(roomId).emit("ToastJoined", username);
   });
 
@@ -42,7 +45,10 @@ io.on("connection", (socket) => {
         rooms.delete(roomId);
       } else {
         // Update connected users for the room
-        io.to(roomId).emit("updateConnectedUsers", Array.from(rooms.get(roomId).values()));
+        io.to(roomId).emit(
+          "updateConnectedUsers",
+          Array.from(rooms.get(roomId).values())
+        );
         io.to(roomId).emit("userLeft", username);
       }
     }
@@ -61,16 +67,23 @@ io.on("connection", (socket) => {
           rooms.delete(roomId);
         } else {
           // Update connected users for the room
-          io.to(roomId).emit("updateConnectedUsers", Array.from(users.values()));
+          io.to(roomId).emit(
+            "updateConnectedUsers",
+            Array.from(users.values())
+          );
           io.to(roomId).emit("userLeft", username);
         }
         console.log(`User ${username} disconnected from room ${roomId}`);
       }
     }
   });
+  socket.on("sendMessage", ({ msg, roomId, username }) => {
+    console.log("Message received:", msg, roomId, username);
+    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Format: hh:mm
+    socket.to(roomId).emit("receiveMessage", { msg, username,time });
+  });
 });
 
 server.listen(3000, () => {
   console.log("Server is running on port 3000");
 });
-
