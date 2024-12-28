@@ -1,4 +1,10 @@
-import React, { createContext, useContext, useState, useEffect, useRef } from "react";
+import React, {
+  createContext,
+  useContext,
+  useState,
+  useEffect,
+  useRef,
+} from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { Menu } from "../Components/Menu";
 import { ToastContainer, toast } from "react-toastify";
@@ -20,7 +26,7 @@ export function HomePage() {
   const [outputDetails, setOutputDetails] = useState(null);
   const [processing, setProcessing] = useState(false);
   const [connectedUsers, setConnectedUsers] = useState([]);
-  const [messages, setMessages] = useState([]);
+  const [messages, setMessages] = useState([]);//msgs ki list
   const socketRef = useRef(null);
 
   useEffect(() => {
@@ -35,6 +41,7 @@ export function HomePage() {
     socketRef.current.on("ToastJoined", (joinedUsername) => {
       showSuccessToast(`${joinedUsername} has joined the room!`);
     });
+    
     socketRef.current.on("userLeft", (joinedUsername) => {
       showErrorToast(`${joinedUsername} has left the room!`);
     });
@@ -45,7 +52,7 @@ export function HomePage() {
       }
     });
     socketRef.current.on("receiveMessage", ({ msg, username, time }) => {
-      setMessages(prevMessages => [...prevMessages, { msg, username, time }]);
+      setMessages((prevMessages) => [...prevMessages, { msg, username, time }]);
     });
 
     return () => {
@@ -54,7 +61,7 @@ export function HomePage() {
         socketRef.current.disconnect();
       }
     };
-  }, []);//ek he baar chlega
+  }, []); //ek he baar chlega
 
   const handleCodeChange = (key, value) => {
     if (key === "code") {
@@ -64,12 +71,14 @@ export function HomePage() {
   };
   const sendMessage = (msg) => {
     if (socketRef.current) {
-      const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const time = new Date().toLocaleTimeString([], {
+        hour: "2-digit",
+        minute: "2-digit",
+      });
       socketRef.current.emit("sendMessage", { msg, roomId, username, time });
-      setMessages(prevMessages => [...prevMessages, { msg, username, time }]);
+      setMessages((prevMessages) => [...prevMessages, { msg, username, time }]);
     }
   };
-
 
   const handleCompile = () => {
     console.log("handleCompile");

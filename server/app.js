@@ -79,8 +79,11 @@ io.on("connection", (socket) => {
   });
   socket.on("sendMessage", ({ msg, roomId, username }) => {
     console.log("Message received:", msg, roomId, username);
-    const time = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }); // Format: hh:mm
-    socket.to(roomId).emit("receiveMessage", { msg, username,time });
+    const time = new Date().toLocaleTimeString([], {
+      hour: "2-digit",
+      minute: "2-digit",
+    }); // Format: hh:mm
+    socket.to(roomId).emit("receiveMessage", { msg, username, time });
   });
 });
 

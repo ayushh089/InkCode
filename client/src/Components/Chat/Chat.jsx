@@ -5,7 +5,6 @@ const Chat = ({ messages, sendMessage, username }) => {
   const [newMessage, setNewMessage] = useState("");
 
   const handleSendMessage = () => {
-
     if (newMessage.trim()) {
       sendMessage(newMessage);
       setNewMessage("");

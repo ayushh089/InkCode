@@ -4,6 +4,8 @@ import { javascript } from "@codemirror/lang-javascript";
 import { oneDark } from "@codemirror/theme-one-dark";
 
 const Editor = ({ onChange, initialCode }) => {
+
+  
   const handleEditorChange = (value) => {
     onChange("code", value);
   };

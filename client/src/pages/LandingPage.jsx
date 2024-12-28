@@ -21,26 +21,26 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
-      <div className="p-8 bg-white rounded-lg shadow-md w-96">
-        <h1 className="text-2xl font-bold mb-6 text-center">
+    <div className="flex items-center justify-center min-h-screen bg-black">
+      <div className="p-8 bg-slate-900 rounded-lg shadow-md w-96">
+        <h1 className="text-2xl font-bold mb-6 text-center text-white">
           Collaborative Code Editor
         </h1>
-        <div className="space-y-4">
+        <div className="space-y-4 ">
           <form onSubmit={joinRoom} className="space-y-2">
             <input
               type="text"
               value={roomId}
               onChange={(e) => setRoomId(e.target.value)}
               placeholder="Enter Room ID"
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 bg-black border text-white border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <input
               type="text"
               value={username}
               onChange={(e) => setUsername(e.target.value)}
               placeholder="Enter your username"
-              className="w-full px-3 py-2 border border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
+              className="w-full px-3 py-2 border bg-black text-white  border-gray-300 rounded focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             <button
               type="submit"
