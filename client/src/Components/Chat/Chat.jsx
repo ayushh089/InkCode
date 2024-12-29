@@ -1,9 +1,10 @@
-import React, { useState } from "react";
+import React, { useState,useContext } from "react";
 import { Send } from "lucide-react";
+import { UserContext } from "../../pages/HomePage";
 
-const Chat = ({ messages, sendMessage, username }) => {
+const Chat = () => {
   const [newMessage, setNewMessage] = useState("");
-
+  const { messages, sendMessage, username}= useContext(UserContext);
   const handleSendMessage = () => {
     if (newMessage.trim()) {
       sendMessage(newMessage);

@@ -1,4 +1,4 @@
-import React, { useState, useContext } from "react";
+import React, { useState, useContext, useId } from "react";
 import {
   Files,
   Play,
@@ -12,22 +12,11 @@ import FileManager from "./FileManager/FileManager";
 import { UserContext } from "../pages/HomePage";
 import ConnectionList from "./Connections/ConnectionList";
 import Chat from "./Chat/Chat";
+import Account from "./Account/Account";
 
 export function Menu() {
-  const {
-    code,
-    setCode,
-    setCustomInput,
-    customInput,
-    outputDetails,
-    processing,
-    handleCompile,
-    connectedUsers,
-    socket,
-    messages,
-    sendMessage,
-    username,
-  } = useContext(UserContext);
+  const [userId, setUserId] = useState(useId());
+  const { username } = useContext(UserContext);
 
   const menuItems = [
     {
@@ -43,7 +32,7 @@ export function Menu() {
     {
       icon: Users,
       label: "Connections",
-      content: <ConnectionList />,
+      content: <ConnectionList id={userId} />,
     },
     {
       icon: Settings,
@@ -68,13 +57,7 @@ export function Menu() {
     {
       icon: MessageCircleMore,
       label: "Chat",
-      content: (
-        <Chat
-          messages={messages}
-          sendMessage={sendMessage}
-          username={username}
-        />
-      ),
+      content: <Chat />,
     },
   ];
 
@@ -83,6 +66,13 @@ export function Menu() {
   const handleMenuClick = (item) => {
     setActivePanel(activePanel === item.label ? null : item.label);
   };
+
+  // Handle click for the user avatar, which will toggle the "Account" panel
+  const handleAvatarClick = () => {
+    setActivePanel(activePanel === "Account" ? null : "Account");
+  };
+
+  const accountPanelContent = <Account />;
 
   return (
     <div className="flex h-screen">
@@ -101,11 +91,20 @@ export function Menu() {
               <item.icon className="h-6 w-6 text-gray-400" />
             </button>
           ))}
+          <div className="text-white fixed bottom-0 mb-5 p-3 cursor-pointer">
+            <img
+              src={`https://ui-avatars.com/api/?name=${username}&background=random&length=1&unique=${userId}`}
+              alt="Avatar"
+              className="account rounded-full w-8 h-8"
+              title="Account"
+              onClick={handleAvatarClick}
+            />
+          </div>
         </nav>
       </div>
 
       {/* Panel */}
-      {activePanel && (
+      {activePanel && activePanel !== "Account" && (
         <div className="w-80 bg-slate-800 border-l-2 border-r-4 border-r-slate-200 border-l-slate-600 animate-slide-in h-full flex flex-col">
           <div className="flex items-center justify-between p-3 border-b border-gray-700">
             <span className="text-white font-medium">
@@ -115,6 +114,16 @@ export function Menu() {
           <div className="flex-1 overflow-y-auto">
             {menuItems.find((item) => item.label === activePanel)?.content}
           </div>
+        </div>
+      )}
+
+      {/* Account Panel */}
+      {activePanel === "Account" && (
+        <div className="w-80 bg-slate-800 border-l-2 border-r-4 border-r-slate-200 border-l-slate-600 animate-slide-in h-full flex flex-col">
+          <div className="flex items-center justify-between p-3 border-b border-gray-700">
+            <span className="text-white font-medium">Account</span>
+          </div>
+          <div className="flex-1 overflow-y-auto">{accountPanelContent}</div>
         </div>
       )}
     </div>

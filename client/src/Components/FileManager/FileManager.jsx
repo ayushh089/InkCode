@@ -27,7 +27,7 @@ const FileManager = () => {
   );
 
   return (
-    <div className=" p-6 h-full bg-gray-900 flex flex-col">
+    <div className=" p-6 h-full bg-slate-800 flex flex-col">
       <button className="w-full text-left p-4 text-white bg-green-600 hover:bg-green-700 rounded-lg transition-colors duration-300 shadow-lg">
         <div className="flex items-center">
           <FilePlus2 className="h-5 w-5 inline-block mr-2" />

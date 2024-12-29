@@ -1,11 +1,12 @@
 import React, { useContext } from "react";
 import { UserContext } from "../../pages/HomePage";
 
-const ConnectionList = () => {
+const ConnectionList = ({id}) => {
   const { connectedUsers } = useContext(UserContext);
 
+
   return (
-    <div className="p-4 bg-gray-800 rounded-lg shadow- h-full">
+    <div className="p-4 bg-slate-800 rounded-lg shadow- h-full">
       <h2 className="text-white text-xl font-semibold mb-4">
         Connected Users: {connectedUsers.length}
       </h2>
@@ -17,7 +18,7 @@ const ConnectionList = () => {
           >
             <div className="mr-3 ">
               <img
-                src={`https://ui-avatars.com/api/?name=${user}&background=random&length=1&unique=${index}`}
+                src={`https://ui-avatars.com/api/?name=${user}&background=random&length=1&unique=${id}`}
                 alt="Ayush Gupta Avatar"
                 className="rounded-full w-8 h-8"
               />
