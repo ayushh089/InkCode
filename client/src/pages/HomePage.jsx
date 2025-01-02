@@ -12,6 +12,7 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import Editor from "../Components/editor/Editor";
 import io from "socket.io-client";
+import VideoCall from "../Components/VideoCall/VideoCall";
 
 const UserContext = createContext();
 const defCode = `console.log("Hello World!");`;
@@ -26,7 +27,8 @@ export function HomePage() {
   const [outputDetails, setOutputDetails] = useState(null);
   const [processing, setProcessing] = useState(false);
   const [connectedUsers, setConnectedUsers] = useState([]);
-  const [messages, setMessages] = useState([]);//msgs ki list
+  const [messages, setMessages] = useState([]); //msgs ki list
+  const [socketId]
   const socketRef = useRef(null);
 
   useEffect(() => {
@@ -41,7 +43,7 @@ export function HomePage() {
     socketRef.current.on("ToastJoined", (joinedUsername) => {
       showSuccessToast(`${joinedUsername} has joined the room!`);
     });
-    
+
     socketRef.current.on("userLeft", (joinedUsername) => {
       showErrorToast(`${joinedUsername} has left the room!`);
     });
@@ -106,8 +108,6 @@ export function HomePage() {
       .request(options)
       .then(function (response) {
         const token = response.data.token;
-        console.log(token);
-
         checkStatus(token);
       })
       .catch((err) => {
@@ -197,16 +197,21 @@ export function HomePage() {
         username,
       }}
     >
-      <div className="flex h-screen bg-gray-100">
+          <div className="flex h-screen bg-gray-100">
         <Menu />
-        <div className="flex-1 flex flex-col overflow-hidden">
-          <main className="flex-1 ">
-            <Editor
-              onChange={handleCodeChange}
-              initialCode={code}
-              connectedUsers={connectedUsers}
-            />
-          </main>
+        <div className="flex-1 flex">
+          <div className="flex-1 flex flex-col overflow-hidden">
+            <main className="flex-1">
+              <Editor
+                onChange={handleCodeChange}
+                initialCode={code}
+                connectedUsers={connectedUsers}
+              />
+            </main>
+          </div>
+          <div className="w-1/3 h-full bg-gray-200 flex flex-col items-center justify-center border-l-8 border-l-slate-800">
+           <VideoCall socket={socketRef.current} />
+          </div>
         </div>
         <ToastContainer />
       </div>
