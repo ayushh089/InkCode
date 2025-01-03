@@ -1,10 +1,4 @@
-import React, {
-  createContext,
-  useContext,
-  useState,
-  useEffect,
-  useRef,
-} from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { useParams, useLocation } from "react-router-dom";
 import { Menu } from "../Components/Menu";
 import { ToastContainer, toast } from "react-toastify";
@@ -14,70 +8,77 @@ import Editor from "../Components/editor/Editor";
 import io from "socket.io-client";
 import VideoCall from "../Components/VideoCall/VideoCall";
 
-const UserContext = createContext();
+const UserContext = React.createContext();
 const defCode = `console.log("Hello World!");`;
 
 export function HomePage() {
   const { roomId } = useParams();
   const location = useLocation();
-  const username = location.state?.username || "Anjan";
+  const username = location.state?.username || "Anonymous";
 
   const [code, setCode] = useState(defCode);
   const [customInput, setCustomInput] = useState("");
   const [outputDetails, setOutputDetails] = useState(null);
   const [processing, setProcessing] = useState(false);
   const [connectedUsers, setConnectedUsers] = useState([]);
-  const [messages, setMessages] = useState([]); //msgs ki list
-  const [socketId]
-  const socketRef = useRef(null);
+  const [messages, setMessages] = useState([]);
+  const [socket, setSocket] = useState(null);
 
   useEffect(() => {
-    socketRef.current = io("http://localhost:3000");
+    const newSocket = io("http://localhost:3000");
+    setSocket(newSocket);
 
-    socketRef.current.emit("joinRoom", { roomId, username });
+    newSocket.on("connect", () => {
+      console.log("Socket connected");
+      newSocket.emit("joinRoom", { roomId, username });
+    });
 
-    socketRef.current.on("updateConnectedUsers", (users) => {
+    newSocket.on("updateConnectedUsers", (users) => {
       setConnectedUsers(users);
     });
 
-    socketRef.current.on("ToastJoined", (joinedUsername) => {
+    newSocket.on("ToastJoined", (joinedUsername) => {
       showSuccessToast(`${joinedUsername} has joined the room!`);
     });
 
-    socketRef.current.on("userLeft", (joinedUsername) => {
-      showErrorToast(`${joinedUsername} has left the room!`);
+    newSocket.on("userLeft", (leftUsername) => {
+      showErrorToast(`${leftUsername} has left the room!`);
     });
 
-    socketRef.current.on("codeChange", (updatedCode) => {
+    newSocket.on("codeChange", (updatedCode) => {
       if (updatedCode !== code) {
         setCode(updatedCode);
       }
     });
-    socketRef.current.on("receiveMessage", ({ msg, username, time }) => {
+
+    newSocket.on("receiveMessage", ({ msg, username, time }) => {
       setMessages((prevMessages) => [...prevMessages, { msg, username, time }]);
     });
 
     return () => {
-      if (socketRef.current) {
-        socketRef.current.emit("leaveRoom", { roomId, username });
-        socketRef.current.disconnect();
+      if (newSocket) {
+        newSocket.emit("leaveRoom", { roomId, username });
+        newSocket.disconnect();
       }
     };
-  }, []); //ek he baar chlega
+  }, [roomId, username]);
 
   const handleCodeChange = (key, value) => {
     if (key === "code") {
       setCode(value);
-      socketRef.current.emit("codeChange", { roomId, code: value });
+      if (socket) {
+        socket.emit("codeChange", { roomId, code: value });
+      }
     }
   };
+
   const sendMessage = (msg) => {
-    if (socketRef.current) {
+    if (socket) {
       const time = new Date().toLocaleTimeString([], {
         hour: "2-digit",
         minute: "2-digit",
       });
-      socketRef.current.emit("sendMessage", { msg, roomId, username, time });
+      socket.emit("sendMessage", { msg, roomId, username, time });
       setMessages((prevMessages) => [...prevMessages, { msg, username, time }]);
     }
   };
@@ -191,7 +192,7 @@ export function HomePage() {
         processing,
         handleCompile,
         connectedUsers,
-        socket: socketRef.current,
+      
         messages,
         sendMessage,
         username,
@@ -209,8 +210,8 @@ export function HomePage() {
               />
             </main>
           </div>
-          <div className="w-1/3 h-full bg-gray-200 flex flex-col items-center justify-center border-l-8 border-l-slate-800">
-           <VideoCall socket={socketRef.current} />
+          <div className="w-1/3 h-full bg-gray-200 flex flex-col border-l-8 border-l-slate-800">
+            <VideoCall socket={socket} roomId={roomId} />
           </div>
         </div>
         <ToastContainer />

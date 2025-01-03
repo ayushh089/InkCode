@@ -57,7 +57,7 @@ const LandingPage = () => {
           </div>
         </div>
       </div>
-      <img src="../../public/home-img.svg" alt="code" className="w-[500px] h-[500px] ml-6  rounded-lg shadow-lg transform transition duration-500 hover:scale-105" />
+      <img src="home-img.svg" alt="code" className="w-[500px] h-[500px] ml-6  rounded-lg shadow-lg transform transition duration-500 hover:scale-105" />
     </div>
   );
 };

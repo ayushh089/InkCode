@@ -85,10 +85,6 @@ io.on("connection", (socket) => {
     }); // Format: hh:mm
     socket.to(roomId).emit("receiveMessage", { msg, username, time });
   });
-  socket.on("video", ({ myStream }) => {
-    console.log("Video event received:", myStream);
-    socket.emit("videoEvent", myStream);
-  });
 });
 
 server.listen(3000, () => {
