@@ -7,7 +7,7 @@ import axios from "axios";
 import Editor from "../Components/editor/Editor";
 import io from "socket.io-client";
 import VideoCall from "../Components/VideoCall/VideoCall";
-
+import { languageOptions } from "../constants/languageOptions";
 const UserContext = React.createContext();
 const defCode = `console.log("Hello World!");`;
 
@@ -23,6 +23,17 @@ export function HomePage() {
   const [connectedUsers, setConnectedUsers] = useState([]);
   const [messages, setMessages] = useState([]);
   const [socket, setSocket] = useState(null);
+  const [languageCode, setLanguageCode] = useState(63);
+
+  const onSelect = (file) => {
+    console.log(file);
+    const extension = "." + file.split(".").pop();
+    const language = languageOptions.find((lang) => lang.extension === extension);
+    const id=language.id;
+    console.log(id);
+    setLanguageCode(id);
+    
+  };
 
   useEffect(() => {
     const newSocket = io("http://localhost:3000");
@@ -88,7 +99,7 @@ export function HomePage() {
 
     setProcessing(true);
     const formData = {
-      language_id: 63, // JavaScript (Node.js 12.14.0)
+      language_id: (languageCode), // JavaScript (Node.js 12.14.0)
       source_code: btoa(code),
       stdin: btoa(customInput),
     };
@@ -192,13 +203,14 @@ export function HomePage() {
         processing,
         handleCompile,
         connectedUsers,
-      
+        onSelect,
         messages,
         sendMessage,
         username,
+        socket
       }}
     >
-          <div className="flex h-screen bg-gray-100">
+      <div className="flex h-screen bg-gray-100">
         <Menu />
         <div className="flex-1 flex">
           <div className="flex-1 flex flex-col overflow-hidden">
@@ -210,9 +222,9 @@ export function HomePage() {
               />
             </main>
           </div>
-          <div className="w-1/3 h-full bg-gray-200 flex flex-col border-l-8 border-l-slate-800">
+          {/* <div className="w-1/3 h-full bg-gray-200 flex flex-col border-l-8 border-l-slate-800">
             <VideoCall socket={socket} roomId={roomId} />
-          </div>
+          </div> */}
         </div>
         <ToastContainer />
       </div>

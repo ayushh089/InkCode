@@ -67,7 +67,6 @@ export function Menu() {
     setActivePanel(activePanel === item.label ? null : item.label);
   };
 
-  // Handle click for the user avatar, which will toggle the "Account" panel
   const handleAvatarClick = () => {
     setActivePanel(activePanel === "Account" ? null : "Account");
   };
@@ -76,7 +75,7 @@ export function Menu() {
 
   return (
     <div className="flex h-screen">
-      {/* Sidebar */}
+  
       <div className="w-16 bg-slate-800 border-r border-gray-800 h-full">
         <nav className="flex flex-col h-full">
           {menuItems.map((item) => (
@@ -103,7 +102,6 @@ export function Menu() {
         </nav>
       </div>
 
-      {/* Panel */}
       {activePanel && activePanel !== "Account" && (
         <div className="w-80 bg-slate-800 border-l-2 border-r-4 border-r-slate-200 border-l-slate-600 animate-slide-in h-full flex flex-col">
           <div className="flex items-center justify-between p-3 border-b border-gray-700">
@@ -117,7 +115,6 @@ export function Menu() {
         </div>
       )}
 
-      {/* Account Panel */}
       {activePanel === "Account" && (
         <div className="w-80 bg-slate-800 border-l-2 border-r-4 border-r-slate-200 border-l-slate-600 animate-slide-in h-full flex flex-col">
           <div className="flex items-center justify-between p-3 border-b border-gray-700">

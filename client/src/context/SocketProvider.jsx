@@ -1,19 +1,23 @@
-import React, { useContext, useMemo } from "react";
-import { createContext } from "react";
-import io from "socket.io-client";
+import React, { useState, useEffect } from "react";
+import socketio from "socket.io-client";
 
-const SocketContext = createContext(null);
+export const SocketContext = React.createContext();
 
-export const useSocket = () => {
-  const socket = useContext(SocketContext);
-  return socket;
-};
+export const SocketProvider = ({ children }) => {
+  const [socket, setSocket] = useState(null);
 
-export const SocketProvider = (props) => {
-  const socket = useMemo(() => io("http://localhost:3000"), []);
+  useEffect(() => {
+    // Connect to socket server when the component mounts
+    const newSocket = socketio.connect("http://localhost:3000");
+    setSocket(newSocket);
+
+    // Cleanup: disconnect socket when component unmounts
+    return () => newSocket.disconnect();
+  }, []);
+
   return (
     <SocketContext.Provider value={socket}>
-      {props.children}
+      {children}
     </SocketContext.Provider>
   );
 };

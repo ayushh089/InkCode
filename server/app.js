@@ -85,6 +85,12 @@ io.on("connection", (socket) => {
     }); // Format: hh:mm
     socket.to(roomId).emit("receiveMessage", { msg, username, time });
   });
+
+
+  socket.on("fileCreated", ({ roomId, files, fileContent }) => {
+    console.log("File created", roomId, files, fileContent);
+    socket.to(roomId).emit("newFiles", { files, fileContent });
+  });
 });
 
 server.listen(3000, () => {
