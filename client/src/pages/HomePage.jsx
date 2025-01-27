@@ -40,7 +40,6 @@ export function HomePage() {
     setSocket(newSocket);
 
     newSocket.on("connect", () => {
-      console.log("Socket connected");
       newSocket.emit("joinRoom", { roomId, username });
     });
 

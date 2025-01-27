@@ -1,158 +1,184 @@
-import React, {
-  useContext,
-  useEffect,
-  useRef,
-  useState,
-  useCallback,
-} from "react";
-import { UserContext } from "../../pages/HomePage";
-import {
-  FilePlus2,
-  FolderOpen,
-  Download,
-  DownloadCloud,
-  File,
-  Pen,
-  Trash2,
-} from "lucide-react";
-import { useParams } from "react-router-dom";
+import React, { useContext, useEffect, useRef, useState, useCallback } from "react"
+import { UserContext } from "../../pages/HomePage"
+import { FilePlus2, FolderOpen, Download, DownloadCloud, File, Pen, Trash2 } from "lucide-react"
+import { useParams } from "react-router-dom"
 
 const FileManager = () => {
-  const { code, setCode, onSelect, socket } = useContext(UserContext);
-  console.log(socket, "socket");
-  const { roomId } = useParams();
+  const { code, setCode, onSelect, socket } = useContext(UserContext)
+  const { roomId } = useParams()
 
-  const [files, setFiles] = useState(() => {
-    const storedFiles = sessionStorage.getItem(
-      import.meta.env.VITE_LOCAL_STORAGE_KEY_FILES
-    );
-    return storedFiles ? JSON.parse(storedFiles) : ["Untitled.js"];
-  });
-
-  const [fileContent, setFileContent] = useState(() => {
-    const storedContent = sessionStorage.getItem(
-      import.meta.env.VITE_LOCAL_STORAGE_KEY_CONTENT
-    );
-    return storedContent ? JSON.parse(storedContent) : { "Untitled.js": "" };
-  });
-
-  const [selectedFile, setSelectedFile] = useState("Untitled.js");
-  const [editableFileIndex, setEditableFileIndex] = useState(null);
-  const inputRefs = useRef([]);
+  const [files, setFiles] = useState([])
+  const [fileContent, setFileContent] = useState({})
+  const [selectedFile, setSelectedFile] = useState(null)
+  const [editableFileIndex, setEditableFileIndex] = useState(null)
+  const inputRefs = useRef([])
 
   useEffect(() => {
-    sessionStorage.setItem(
-      import.meta.env.VITE_LOCAL_STORAGE_KEY_FILES,
-      JSON.stringify(files)
-    );
-    sessionStorage.setItem(
-      import.meta.env.VITE_LOCAL_STORAGE_KEY_CONTENT,
-      JSON.stringify(fileContent)
-    );
-  }, [files, fileContent, socket]);
+    if (!socket) return
 
-  useEffect(() => {
-    setFileContent((prevContent) => ({
-      ...prevContent,
-      [selectedFile]: code,
-    }));
-  }, [code, selectedFile]);
+    socket.emit("requestFiles", { roomId })
 
-  useEffect(() => {
-    if (!socket) {
-      console.log("Socket not found");
-      return;
-    }
-    socket.emit("fileCreated", { roomId, files, fileContent });
-
-    socket.on(
-      "newFiles",
-      ({ files: newFiles, fileContent: newFileContent }) => {
-        setFiles((prevFiles) => {
-          const mergedFiles = [...new Set([...prevFiles, ...newFiles])];
-          return mergedFiles;
-        });
-
-        setFileContent((prevContent) => ({
-          ...prevContent,
-          ...newFileContent,
-        }));
+    socket.on("initFiles", (roomFiles) => {
+      const newFiles = roomFiles.map(([fileName]) => fileName)
+      const newFileContent = Object.fromEntries(roomFiles)
+      setFiles(newFiles)
+      setFileContent(newFileContent)
+      if (newFiles.length > 0 && !selectedFile) {
+        setSelectedFile(newFiles[0])
+        setCode(newFileContent[newFiles[0]] || "")
       }
-    );
+    })
+
+    socket.on("newFile", ({ fileName, content }) => {
+      setFiles((prevFiles) => [...prevFiles, fileName])
+      setFileContent((prevContent) => ({ ...prevContent, [fileName]: content }))
+    })
+
+    socket.on("fileDeleted", ({ fileName }) => {
+      setFiles((prevFiles) => prevFiles.filter((file) => file !== fileName))
+      setFileContent((prevContent) => {
+        const newContent = { ...prevContent }
+        delete newContent[fileName]
+        return newContent
+      })
+      if (selectedFile === fileName) {
+        const newSelectedFile = files.find((file) => file !== fileName) || null
+        setSelectedFile(newSelectedFile)
+        setCode(newSelectedFile ? fileContent[newSelectedFile] : "")
+      }
+    })
+
+    socket.on("fileRenamed", ({ oldName, newName }) => {
+      setFiles((prevFiles) => prevFiles.map((file) => (file === oldName ? newName : file)))
+      setFileContent((prevContent) => {
+        const newContent = { ...prevContent }
+        newContent[newName] = newContent[oldName]
+        delete newContent[oldName]
+        return newContent
+      })
+      if (selectedFile === oldName) {
+        setSelectedFile(newName)
+      }
+    })
+
+    socket.on("codeChange", ({ fileName, code }) => {
+      setFileContent((prevContent) => ({
+        ...prevContent,
+        [fileName]: code,
+      }))
+      if (fileName === selectedFile) {
+        setCode(code)
+      }
+    })
 
     return () => {
-      socket.off("newFiles");
-    };
-  }, [socket, files, fileContent]);
+      socket.off("initFiles")
+      socket.off("newFile")
+      socket.off("fileDeleted")
+      socket.off("fileRenamed")
+      socket.off("codeChange")
+    }
+  }, [socket, roomId, selectedFile, setCode, files, fileContent])
+
+  useEffect(() => {
+    if (selectedFile) {
+      setFileContent((prevContent) => ({
+        ...prevContent,
+        [selectedFile]: code,
+      }))
+      if (socket) {
+        socket.emit("codeChange", { roomId, fileName: selectedFile, code })
+      }
+    }
+  }, [code, selectedFile, socket, roomId])
 
   const createNewFile = useCallback(() => {
-    const newFileName = `Untitled-${files.length + 1}`;
-    setFiles((prevFiles) => [...prevFiles, newFileName]);
-    setFileContent((prevContent) => ({ ...prevContent, [newFileName]: "" }));
-  }, [files.length]);
+    const newFileName = `Untitled-${files.length + 1}.js`
+    const newContent = ""
+    setFiles((prevFiles) => [...prevFiles, newFileName])
+    setFileContent((prevContent) => ({ ...prevContent, [newFileName]: newContent }))
+    setSelectedFile(newFileName)
+    setCode(newContent)
+
+    if (socket) {
+      socket.emit("fileCreated", { roomId, fileName: newFileName, content: newContent })
+    }
+  }, [files, socket, roomId, setCode])
 
   const renameFile = useCallback(
     (oldName, newName) => {
-      if (!newName.trim() || files.includes(newName)) return;
-      setFiles((prevFiles) =>
-        prevFiles.map((file) => (file === oldName ? newName : file))
-      );
+      if (!newName.trim() || files.includes(newName) || oldName === newName) return
+
+      setFiles((prevFiles) => prevFiles.map((file) => (file === oldName ? newName : file)))
       setFileContent((prevContent) => {
         const updatedContent = {
           ...prevContent,
           [newName]: prevContent[oldName],
-        };
-        delete updatedContent[oldName];
-        return updatedContent;
-      });
-      if (selectedFile === oldName) setSelectedFile(newName);
-      setEditableFileIndex(null);
+        }
+        delete updatedContent[oldName]
+        return updatedContent
+      })
+
+      if (selectedFile === oldName) setSelectedFile(newName)
+      setEditableFileIndex(null)
+
+      if (socket) {
+        socket.emit("renameFile", { roomId, oldName, newName })
+      }
     },
-    [files, selectedFile]
-  );
+    [files, selectedFile, socket, roomId],
+  )
 
   const deleteFile = useCallback(
     (fileName) => {
-      setFiles((prevFiles) => {
-        const updatedFiles = prevFiles.filter((file) => file !== fileName);
-        setFileContent((prevContent) => {
-          const updatedContent = { ...prevContent };
-          delete updatedContent[fileName];
-          return updatedContent;
-        });
+      setFiles((prevFiles) => prevFiles.filter((file) => file !== fileName))
+      setFileContent((prevContent) => {
+        const updatedContent = { ...prevContent }
+        delete updatedContent[fileName]
+        return updatedContent
+      })
 
-        if (selectedFile === fileName) {
-          const newSelectedFile =
-            updatedFiles.length > 0 ? updatedFiles[0] : null;
-          setSelectedFile(newSelectedFile);
-          if (newSelectedFile) {
-            setCode((prevContent) => prevContent[newSelectedFile] || "");
-          } else {
-            setCode("");
-          }
-        }
+      if (selectedFile === fileName) {
+        const newSelectedFile = files.find((file) => file !== fileName) || null
+        setSelectedFile(newSelectedFile)
+        setCode(newSelectedFile ? fileContent[newSelectedFile] : "")
+      }
 
-        return updatedFiles;
-      });
+      if (socket) {
+        socket.emit("deleteFile", { roomId, fileName })
+      }
     },
-    [selectedFile, setCode]
-  );
+    [selectedFile, setCode, fileContent, socket, roomId, files],
+  )
 
   const handleSelectedFile = useCallback(
     (fileName) => {
-      setSelectedFile(fileName);
-      setCode(fileContent[fileName]);
-      onSelect(fileName);
+      setSelectedFile(fileName)
+      setCode(fileContent[fileName] || "")
+      onSelect(fileName)
     },
-    [fileContent, onSelect, setCode]
-  );
+    [fileContent, onSelect, setCode],
+  )
 
   const handleEdit = useCallback((index) => {
-    setEditableFileIndex(index);
+    setEditableFileIndex(index)
     setTimeout(() => {
-      inputRefs.current[index]?.focus();
-    }, 0);
-  }, []);
+      if (inputRefs.current[index]) {
+        inputRefs.current[index].focus()
+        inputRefs.current[index].select()
+      }
+    }, 0)
+  }, [])
+
+  const handleRename = useCallback(
+    (e, oldName, newName) => {
+      if (e.key === "Enter" || e.type === "blur") {
+        e.preventDefault()
+        renameFile(oldName, newName)
+      }
+    },
+    [renameFile],
+  )
 
   return (
     <div className="p-6 h-full bg-slate-800 flex flex-col">
@@ -169,7 +195,7 @@ const FileManager = () => {
       <div className="mt-6 mb-4 flex-grow overflow-y-auto">
         <h2 className="text-xl font-bold text-white mb-3">Files</h2>
         <div className="space-y-2">
-          {files.map((file, index) => (
+          {files.filter(file => file).map((file, index) => (
             <div
               key={file}
               className={`flex items-center space-x-2 p-3 bg-gray-800 rounded-lg shadow-inner ${
@@ -183,25 +209,28 @@ const FileManager = () => {
                 type="text"
                 defaultValue={file}
                 className={`bg-transparent text-white border-none outline-none w-full cursor-pointer ${
-                  editableFileIndex === index
-                    ? "caret-white"
-                    : "caret-transparent"
+                  editableFileIndex === index ? "caret-white" : "caret-transparent"
                 }`}
-                onBlur={(e) => renameFile(file, e.target.value)}
+                onBlur={(e) => handleRename(e, file, e.target.value)}
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") {
+                    handleRename(e, file, e.target.value)
+                  }
+                }}
                 readOnly={editableFileIndex !== index}
               />
               <div className="flex items-center space-x-5">
                 <Pen
                   onClick={(e) => {
-                    e.stopPropagation();
-                    handleEdit(index);
+                    e.stopPropagation()
+                    handleEdit(index)
                   }}
                   className="text-white h-5 w-5 ml-auto hover:text-yellow-500 hover:scale-150"
                 />
                 <Trash2
                   onClick={(e) => {
-                    e.stopPropagation();
-                    deleteFile(file);
+                    e.stopPropagation()
+                    deleteFile(file)
                   }}
                   className="text-white h-5 w-5 ml-auto hover:text-yellow-500 hover:scale-150"
                 />
@@ -225,7 +254,8 @@ const FileManager = () => {
         </button>
       </div>
     </div>
-  );
-};
+  )
+}
 
-export default FileManager;
+export default FileManager
+
