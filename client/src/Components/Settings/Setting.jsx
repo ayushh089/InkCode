@@ -11,7 +11,6 @@ const Setting = () => {
   const handleThemeChange = (event) => {
     const selectedTheme = event.target.value;
     setTheme(selectedTheme);
-    // document.documentElement.setAttribute("data-theme", selectedTheme);
   };
 
   return (

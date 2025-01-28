@@ -2,8 +2,8 @@ import React, { useContext, useEffect, useRef, useState, useCallback } from "rea
 import { UserContext } from "../../pages/HomePage"
 import { FilePlus2, FolderOpen, Download, DownloadCloud, File, Pen, Trash2 } from "lucide-react"
 import { useParams } from "react-router-dom"
-import JSZip from "jszip"  // Add JSZip for downloading all files as a zip
-import { saveAs } from "file-saver"  // Add file-saver for saving files
+import JSZip from "jszip"  
+import { saveAs } from "file-saver"  
 
 const FileManager = () => {
   const { code, setCode, onSelect, socket } = useContext(UserContext)
@@ -22,7 +22,7 @@ const FileManager = () => {
     socket.on("initFiles", (roomFiles) => {
       const newFiles = roomFiles.map(([fileName]) => fileName)
       const newFileContent = Object.fromEntries(roomFiles)
-      setFiles(newFiles.length > 0 ? newFiles : ["Untitled.js"])  // Default to Untitled.js if no files
+      setFiles(newFiles.length > 0 ? newFiles : ["Untitled.js"])  
       setFileContent(newFileContent)
   
       if (newFiles.length > 0 && !selectedFile) {
@@ -189,7 +189,7 @@ const FileManager = () => {
   const openFile = useCallback(() => {
     const fileInput = document.createElement("input");
     fileInput.type = "file";
-    fileInput.accept = ".js,.txt,.html"; // Adjust file types as needed
+    fileInput.accept = ".js,.txt,.html";
     fileInput.onchange = async (e) => {
       const file = e.target.files[0];
       if (!file) return;
@@ -208,25 +208,23 @@ const FileManager = () => {
     fileInput.click();
   }, [setCode]);
   const downloadFile = () => {
-    if (!selectedFile || !fileContent[selectedFile]) return; // Ensure there is a selected file with content
+    if (!selectedFile || !fileContent[selectedFile]) return; 
     console.log(fileContent[selectedFile]);
     
   
     const fileData = fileContent[selectedFile];
-    const blob = new Blob([fileData], { type: 'text/plain' }); // You can change the MIME type depending on the file type
+    const blob = new Blob([fileData], { type: 'text/plain' }); 
     const url = URL.createObjectURL(blob);
   
     const a = document.createElement('a');
     a.href = url;
-    a.download = selectedFile; // The name of the downloaded file will be the selected file's name
+    a.download = selectedFile; 
     document.body.appendChild(a);
     a.click();
   
-    // Clean up the URL object
     URL.revokeObjectURL(url);
   };
 
-  // Download All Files Handler
   const downloadAllFiles = useCallback(() => {
     const zip = new JSZip()
     files.forEach((fileName) => {

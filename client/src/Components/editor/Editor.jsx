@@ -9,7 +9,7 @@ import { materialDark, materialLight } from "@uiw/codemirror-theme-material"
 
 const Editor = ({ onChange, initialCode, size, theme }) => {
   const themes = {
-    light: undefined, // Default light theme
+    light: undefined, 
     dark: oneDark,
     dracula: dracula,
     solarizedLight: solarizedLight,
