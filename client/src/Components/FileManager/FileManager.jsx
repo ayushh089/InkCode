@@ -6,9 +6,8 @@ import { useParams } from "react-router-dom"
 const FileManager = () => {
   const { code, setCode, onSelect, socket } = useContext(UserContext)
   const { roomId } = useParams()
-
-  const [files, setFiles] = useState([])
-  const [fileContent, setFileContent] = useState({})
+  const [files, setFiles] = useState(["Untitled.js"])
+  const [fileContent, setFileContent] = useState({"Untitled.js":"console.log('Hello World!')"})
   const [selectedFile, setSelectedFile] = useState(null)
   const [editableFileIndex, setEditableFileIndex] = useState(null)
   const inputRefs = useRef([])
@@ -21,13 +20,18 @@ const FileManager = () => {
     socket.on("initFiles", (roomFiles) => {
       const newFiles = roomFiles.map(([fileName]) => fileName)
       const newFileContent = Object.fromEntries(roomFiles)
-      setFiles(newFiles)
+      setFiles(newFiles.length > 0 ? newFiles : ["Untitled.js"])  // Default to Untitled.js if no files
       setFileContent(newFileContent)
+  
       if (newFiles.length > 0 && !selectedFile) {
         setSelectedFile(newFiles[0])
         setCode(newFileContent[newFiles[0]] || "")
+      } else if (newFiles.length === 0 && !selectedFile) {
+        setSelectedFile("Untitled.js")
+        setCode("console.log('Hello World!')")
       }
     })
+  
 
     socket.on("newFile", ({ fileName, content }) => {
       setFiles((prevFiles) => [...prevFiles, fileName])
@@ -92,7 +96,7 @@ const FileManager = () => {
     }
   }, [code, selectedFile, socket, roomId])
 
-  const createNewFile = useCallback(() => {
+  const createNewFile = useCallback(() => {    
     const newFileName = `Untitled-${files.length + 1}.js`
     const newContent = ""
     setFiles((prevFiles) => [...prevFiles, newFileName])

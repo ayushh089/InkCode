@@ -86,6 +86,7 @@ io.on("connection", (socket) => {
   })
 
   socket.on("requestFiles", ({ roomId }) => {
+    // console.log(`Received request for files in room ${roomId}`)
     if (rooms.has(roomId)) {
       const roomFiles = Array.from(rooms.get(roomId).files.entries())
       socket.emit("initFiles", roomFiles)
@@ -93,6 +94,7 @@ io.on("connection", (socket) => {
   })
 
   socket.on("fileCreated", ({ roomId, fileName, content }) => {
+    console.log(`Received create request: ${fileName}`)
     if (rooms.has(roomId)) {
       rooms.get(roomId).files.set(fileName, content)
       socket.to(roomId).emit("newFile", { fileName, content })
@@ -100,6 +102,7 @@ io.on("connection", (socket) => {
   })
 
   socket.on("deleteFile", ({ roomId, fileName }) => {
+    console.log(`Received delete request: ${fileName}`)
     if (rooms.has(roomId)) {
       rooms.get(roomId).files.delete(fileName)
       socket.to(roomId).emit("fileDeleted", { fileName })
@@ -107,6 +110,8 @@ io.on("connection", (socket) => {
   })
 
   socket.on("renameFile", ({ roomId, oldName, newName }) => {
+    console.log(`Received rename request: ${oldName} -> ${newName}`);
+    
     if (rooms.has(roomId)) {
       const content = rooms.get(roomId).files.get(oldName)
       rooms.get(roomId).files.delete(oldName)

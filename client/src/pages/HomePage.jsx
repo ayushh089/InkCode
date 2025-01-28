@@ -24,13 +24,13 @@ export function HomePage() {
   const [messages, setMessages] = useState([]);
   const [socket, setSocket] = useState(null);
   const [languageCode, setLanguageCode] = useState(63);
+  const [size, setSize] = useState(1);
+  const [theme, setTheme] = useState("dark");
 
   const onSelect = (file) => {
-    console.log(file);
     const extension = "." + file.split(".").pop();
     const language = languageOptions.find((lang) => lang.extension === extension);
     const id=language.id;
-    console.log(id);
     setLanguageCode(id);
     
   };
@@ -94,7 +94,6 @@ export function HomePage() {
   };
 
   const handleCompile = () => {
-    console.log("handleCompile");
 
     setProcessing(true);
     const formData = {
@@ -124,7 +123,6 @@ export function HomePage() {
       .catch((err) => {
         let error = err.response ? err.response.data : err;
         setProcessing(false);
-        console.log("catch block...", error);
         showErrorToast(error.source_code[0]);
       });
   };
@@ -151,7 +149,6 @@ export function HomePage() {
       } else {
         setProcessing(false);
         setOutputDetails(response.data);
-        console.log("response.data", response.data);
         let status_desc = response.data?.status?.description;
         let status_id = response.data?.status?.id;
         if (status_id === 3) {
@@ -161,7 +158,6 @@ export function HomePage() {
         }
       }
     } catch (err) {
-      console.log("err", err);
       setProcessing(false);
       showErrorToast(err);
     }
@@ -206,7 +202,9 @@ export function HomePage() {
         messages,
         sendMessage,
         username,
-        socket
+        socket,
+        setSize
+        ,setTheme
       }}
     >
       <div className="flex h-screen bg-gray-100">
@@ -218,11 +216,13 @@ export function HomePage() {
                 onChange={handleCodeChange}
                 initialCode={code}
                 connectedUsers={connectedUsers}
+                size={size}
+                theme={theme}
               />
             </main>
           </div>
           {/* <div className="w-1/3 h-full bg-gray-200 flex flex-col border-l-8 border-l-slate-800">
-            <VideoCall socket={socket} roomId={roomId} />
+            <VideoCall socket={socket} roomId={roomId} username={username} />
           </div> */}
         </div>
         <ToastContainer />
