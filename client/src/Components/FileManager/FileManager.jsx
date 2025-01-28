@@ -2,6 +2,8 @@ import React, { useContext, useEffect, useRef, useState, useCallback } from "rea
 import { UserContext } from "../../pages/HomePage"
 import { FilePlus2, FolderOpen, Download, DownloadCloud, File, Pen, Trash2 } from "lucide-react"
 import { useParams } from "react-router-dom"
+import JSZip from "jszip"  // Add JSZip for downloading all files as a zip
+import { saveAs } from "file-saver"  // Add file-saver for saving files
 
 const FileManager = () => {
   const { code, setCode, onSelect, socket } = useContext(UserContext)
@@ -184,6 +186,57 @@ const FileManager = () => {
     [renameFile],
   )
 
+  const openFile = useCallback(() => {
+    const fileInput = document.createElement("input");
+    fileInput.type = "file";
+    fileInput.accept = ".js,.txt,.html"; // Adjust file types as needed
+    fileInput.onchange = async (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        const fileContent = reader.result;
+        const newFileName = file.name;
+        setFiles((prevFiles) => [...prevFiles, newFileName]);
+        setFileContent((prevContent) => ({ ...prevContent, [newFileName]: fileContent }));
+        setSelectedFile(newFileName);
+        setCode(fileContent);
+      };
+      reader.readAsText(file);
+    };
+    fileInput.click();
+  }, [setCode]);
+  const downloadFile = () => {
+    if (!selectedFile || !fileContent[selectedFile]) return; // Ensure there is a selected file with content
+    console.log(fileContent[selectedFile]);
+    
+  
+    const fileData = fileContent[selectedFile];
+    const blob = new Blob([fileData], { type: 'text/plain' }); // You can change the MIME type depending on the file type
+    const url = URL.createObjectURL(blob);
+  
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = selectedFile; // The name of the downloaded file will be the selected file's name
+    document.body.appendChild(a);
+    a.click();
+  
+    // Clean up the URL object
+    URL.revokeObjectURL(url);
+  };
+
+  // Download All Files Handler
+  const downloadAllFiles = useCallback(() => {
+    const zip = new JSZip()
+    files.forEach((fileName) => {
+      zip.file(fileName, fileContent[fileName] || "")
+    })
+    zip.generateAsync({ type: "blob" }).then((content) => {
+      saveAs(content, "all_files.zip")
+    })
+  }, [files, fileContent])
+
   return (
     <div className="p-6 h-full bg-slate-800 flex flex-col">
       <button
@@ -202,9 +255,7 @@ const FileManager = () => {
           {files.filter(file => file).map((file, index) => (
             <div
               key={file}
-              className={`flex items-center space-x-2 p-3 bg-gray-800 rounded-lg shadow-inner ${
-                selectedFile === file ? "bg-slate-700" : "hover:bg-gray-700"
-              } transition-colors duration-200 cursor-pointer`}
+              className={`flex items-center space-x-2 p-3 bg-gray-800 rounded-lg shadow-inner ${selectedFile === file ? "bg-slate-700" : "hover:bg-gray-700"} transition-colors duration-200 cursor-pointer`}
               onClick={() => handleSelectedFile(file)}
             >
               <File className="h-5 text-yellow-500" />
@@ -212,9 +263,7 @@ const FileManager = () => {
                 ref={(el) => (inputRefs.current[index] = el)}
                 type="text"
                 defaultValue={file}
-                className={`bg-transparent text-white border-none outline-none w-full cursor-pointer ${
-                  editableFileIndex === index ? "caret-white" : "caret-transparent"
-                }`}
+                className={`bg-transparent text-white border-none outline-none w-full cursor-pointer ${editableFileIndex === index ? "caret-white" : "caret-transparent"}`}
                 onBlur={(e) => handleRename(e, file, e.target.value)}
                 onKeyDown={(e) => {
                   if (e.key === "Enter") {
@@ -243,16 +292,17 @@ const FileManager = () => {
           ))}
         </div>
       </div>
+
       <div className="space-y-3 mt-4">
-        <button className="w-full text-left p-3 text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors duration-300 flex items-center shadow-lg">
+        <button onClick={openFile} className="w-full text-left p-3 text-white bg-indigo-600 hover:bg-indigo-700 rounded-lg transition-colors duration-300 flex items-center shadow-lg">
           <FolderOpen className="h-5 w-5 inline-block mr-2" />
           <span>Open File</span>
         </button>
-        <button className="w-full text-left p-3 text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-300 flex items-center shadow-lg">
+        <button onClick={downloadFile} className="w-full text-left p-3 text-white bg-blue-600 hover:bg-blue-700 rounded-lg transition-colors duration-300 flex items-center shadow-lg">
           <Download className="h-5 w-5 inline-block mr-2" />
           <span>Download File</span>
         </button>
-        <button className="w-full text-left p-3 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors duration-300 flex items-center shadow-lg">
+        <button onClick={downloadAllFiles} className="w-full text-left p-3 text-white bg-red-600 hover:bg-red-700 rounded-lg transition-colors duration-300 flex items-center shadow-lg">
           <DownloadCloud className="h-5 w-5 inline-block mr-2" />
           <span>Download All Files</span>
         </button>
@@ -262,4 +312,3 @@ const FileManager = () => {
 }
 
 export default FileManager
-
