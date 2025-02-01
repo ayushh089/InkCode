@@ -1,30 +1,32 @@
 const express = require("express");
 const app = express();
 const http = require("http");
+const path = require("path");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 
 const io = new Server(server, {
   cors: {
-    origin: ["https://ink-code-frontend.vercel.app", "http://localhost:3000"],
+    origin: "*",
     methods: ["GET", "POST"],
-    allowedHeaders: ["my-custom-header"],
     credentials: true,
   },
 });
-const cors = require("cors");
 
-app.use(
-  cors({
-    origin: ["https://ink-code-frontend.vercel.app", "http://localhost:3000"],
-    methods: ["GET", "POST"],
-    allowedHeaders: ["my-custom-header"],
-    credentials: true,
-  })
-);
-app.get("/", (req, res) => {
-  res.json("Server is running");
-});
+const __dirname = path.resolve();
+if (process.env.NODE_ENV === "production") {
+  app.use(express.static(path.join(__dirname, "/client/dist")));
+  app.get("*", (req, res) =>
+    res.sendFile(path.resolve(__dirname, "client", "dist", "index.html"))
+  );
+
+}
+else{
+  app.get("/", (req, res) => {
+    res.send("API is running...");
+  });
+}
+
 const rooms = new Map();
 
 io.on("connection", (socket) => {
