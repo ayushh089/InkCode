@@ -29,14 +29,15 @@ export function HomePage() {
 
   const onSelect = (file) => {
     const extension = "." + file.split(".").pop();
-    const language = languageOptions.find((lang) => lang.extension === extension);
-    const id=language.id;
+    const language = languageOptions.find(
+      (lang) => lang.extension === extension
+    );
+    const id = language.id;
     setLanguageCode(id);
-    
   };
 
   useEffect(() => {
-    const newSocket = io("https://inkcode.onrender.com");
+    const newSocket = io(import.meta.env.VITE_APP_SOCKET_URL || "http://localhost:3000");
     setSocket(newSocket);
 
     newSocket.on("connect", () => {
@@ -94,10 +95,9 @@ export function HomePage() {
   };
 
   const handleCompile = () => {
-
     setProcessing(true);
     const formData = {
-      language_id: (languageCode), // JavaScript (Node.js 12.14.0)
+      language_id: languageCode, // JavaScript (Node.js 12.14.0)
       source_code: btoa(code),
       stdin: btoa(customInput),
     };
@@ -203,8 +203,8 @@ export function HomePage() {
         sendMessage,
         username,
         socket,
-        setSize
-        ,setTheme
+        setSize,
+        setTheme,
       }}
     >
       <div className="flex h-screen bg-gray-100">
