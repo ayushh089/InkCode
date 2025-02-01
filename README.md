@@ -31,13 +31,34 @@ To install InkCode, follow these steps:
 
 ## Usage
 
-To start using InkCode, run the following command:
+To start using InkCode, you need to run both the client and server. Use the following commands:
+
+1. Start the client:
+    ```sh
+    npm run dev
+    ```
+
+2. Start the server:
+    ```sh
+    node app.js
+    ```
+    or, if you have `nodemon` installed:
+    ```sh
+    nodemon app.js
+    ```
+
+## Environment Variables
+
+To run InkCode, you need to set up the following environment variables:
+
 ```sh
-npm start
+VITE_RAPID_API_HOST=judge0-ce.p.rapidapi.com
+VITE_RAPID_API_KEY=YOUR_RAPID_API_KEY
+VITE_RAPID_API_URL=https://judge0-ce.p.rapidapi.com/submissions
 ```
 
-
+To get your RapidAPI key, visit [Judge0 API](https://rapidapi.com/judge0-official/api/judge0-ce).
 
 ## Contact
 
-For any questions or feedback, please reach out to us at guptaayush1280@gmail.com
+For any questions or feedback, please reach out to us at [guptaayush1280@gmail.com](mailto:guptaayush1280@gmail.com)
