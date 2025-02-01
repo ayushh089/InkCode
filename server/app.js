@@ -6,7 +6,7 @@ const { Server } = require("socket.io");
 
 const io = new Server(server, {
   cors: {
-    origin: "http://inkcode.vercel.app",
+    origin: "https://ink-code-frontend.vercel.app",
     methods: ["GET", "POST"],
     credentials: true,
   },
