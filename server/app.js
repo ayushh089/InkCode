@@ -4,14 +4,24 @@ const http = require("http");
 const server = http.createServer(app);
 const { Server } = require("socket.io");
 
-const io = require('socket.io')(server, {
+const io = new Server(server, {
   cors: {
-    origin: "https://ink-code-frontend.vercel.app",
+    origin: ["https://ink-code-frontend.vercel.app", "http://localhost:3000"],
     methods: ["GET", "POST"],
     allowedHeaders: ["my-custom-header"],
-    credentials: true
-  }
+    credentials: true,
+  },
 });
+const cors = require("cors");
+
+app.use(
+  cors({
+    origin: ["https://ink-code-frontend.vercel.app", "http://localhost:3000"],
+    methods: ["GET", "POST"],
+    allowedHeaders: ["my-custom-header"],
+    credentials: true,
+  })
+);
 app.get("/", (req, res) => {
   res.json("Server is running");
 });
