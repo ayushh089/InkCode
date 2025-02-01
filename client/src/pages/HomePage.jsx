@@ -36,7 +36,7 @@ export function HomePage() {
   };
 
   useEffect(() => {
-    const newSocket = io("http://localhost:3000");
+    const newSocket = io("https://ink-code-api.vercel.app");
     setSocket(newSocket);
 
     newSocket.on("connect", () => {
