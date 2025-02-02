@@ -97,7 +97,8 @@ io.on("connection", (socket) => {
 
   socket.on("sendMessage", ({ msg, roomId, username }) => {
     console.log("Message received:", msg, roomId, username);
-    const time = new Date().toLocaleTimeString([], {
+    const time = new Date().toLocaleTimeString("en-IN", {
+      timeZone: "Asia/Kolkata",
       hour: "2-digit",
       minute: "2-digit",
     });
