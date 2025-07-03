@@ -26,22 +26,36 @@ export function HomePage() {
   const [languageCode, setLanguageCode] = useState(63);
   const [size, setSize] = useState(1);
   const [theme, setTheme] = useState("dark");
+  const [currentFile, setCurrentFile] = useState(null);
+  const [files, setFiles] = useState(["Untitled.js"])
+  const [fileContent, setFileContent] = useState({"Untitled.js":"console.log('Hello World!')"})
+  const [selectedFile, setSelectedFile] = useState(null)
+  const isUpdatingFromRemote = useRef(false);
 
   const onSelect = (file) => {
     const extension = "." + file.split(".").pop();
     const language = languageOptions.find(
       (lang) => lang.extension === extension
     );
-    const id = language.id;
-    setLanguageCode(id);
+    if (language) {
+      setLanguageCode(language.id);
+    }
+    setCurrentFile(file);
   };
 
   useEffect(() => {
-    const newSocket = io(import.meta.env.VITE_APP_SOCKET_URL || "http://localhost:3000");
+    const newSocket = io(
+      import.meta.env.VITE_APP_SOCKET_URL || "http://localhost:3000"
+    );
     setSocket(newSocket);
 
     newSocket.on("connect", () => {
+      console.log("Connected to server");
       newSocket.emit("joinRoom", { roomId, username });
+    });
+
+    newSocket.on("disconnect", () => {
+      console.log("Disconnected from server");
     });
 
     newSocket.on("updateConnectedUsers", (users) => {
@@ -56,14 +70,14 @@ export function HomePage() {
       showErrorToast(`${leftUsername} has left the room!`);
     });
 
-    newSocket.on("codeChange", (updatedCode) => {
-      if (updatedCode !== code) {
-        setCode(updatedCode);
-      }
-    });
-
     newSocket.on("receiveMessage", ({ msg, username, time }) => {
       setMessages((prevMessages) => [...prevMessages, { msg, username, time }]);
+    });
+
+    // Handle connection errors
+    newSocket.on("connect_error", (error) => {
+      console.error("Connection error:", error);
+      showErrorToast("Connection failed. Please try again.");
     });
 
     return () => {
@@ -75,11 +89,8 @@ export function HomePage() {
   }, [roomId, username]);
 
   const handleCodeChange = (key, value) => {
-    if (key === "code") {
+    if (key === "code" && !isUpdatingFromRemote.current) {
       setCode(value);
-      if (socket) {
-        socket.emit("codeChange", { roomId, code: value });
-      }
     }
   };
 
@@ -205,6 +216,14 @@ export function HomePage() {
         socket,
         setSize,
         setTheme,
+        files,
+        setFiles,
+        fileContent,
+        setFileContent,
+        selectedFile,
+        setSelectedFile,
+        currentFile,
+        setCurrentFile,
       }}
     >
       <div className="flex h-screen bg-gray-100">

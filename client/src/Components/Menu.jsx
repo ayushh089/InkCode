@@ -71,6 +71,11 @@ export function Menu() {
 
   return (
     <div className="flex h-screen">
+          <div className={`w-80 bg-slate-800 h-full flex flex-col ${
+      activePanel === "Files" ? "hidden" : "hidden"
+    }`}>
+      <FileManager />
+    </div>
   
       <div className="w-16 bg-slate-800 border-r border-gray-800 h-full">
         <nav className="flex flex-col h-full">
