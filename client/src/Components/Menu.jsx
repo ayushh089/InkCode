@@ -14,6 +14,7 @@ import ConnectionList from "./Connections/ConnectionList";
 import Chat from "./Chat/Chat";
 import Account from "./Account/Account";
 import Setting from "./Settings/Setting";
+import VideoCall from "./VideoCall/VideoCall";
 
 export function Menu() {
   const [userId, setUserId] = useState(useId());
@@ -43,12 +44,7 @@ export function Menu() {
     {
       icon: Camera,
       label: "Video",
-      content: (
-        <div className="p-4">
-          <h2 className="text-white text-lg mb-4">Video</h2>
-          <div className="text-gray-300">Will be released Soon 🔜</div>
-        </div>
-      ),
+      content:<VideoCall />,
     },
     {
       icon: MessageCircleMore,

@@ -36,7 +36,7 @@ io.on("connection", (socket) => {
       rooms.set(roomId, { 
         users: new Map(), 
         files: new Map(),
-        activeUsers: new Map() // Track which file each user is editing
+        activeUsers: new Map()
       });
     }
     
@@ -44,11 +44,9 @@ io.on("connection", (socket) => {
     room.users.set(socket.id, username);
     console.log(`User ${username} joined room ${roomId}`);
 
-    // Send current files to the new user
     const roomFiles = Array.from(room.files.entries());
     socket.emit("initFiles", roomFiles);
 
-    // Send current active users info
     const activeUsersInfo = Array.from(room.activeUsers.entries()).map(([userId, data]) => ({
       userId,
       username: room.users.get(userId),
@@ -57,7 +55,6 @@ io.on("connection", (socket) => {
     }));
     socket.emit("activeUsersUpdate", activeUsersInfo);
 
-    // Broadcast updated user list
     io.to(roomId).emit(
       "updateConnectedUsers",
       Array.from(room.users.values())
@@ -73,7 +70,6 @@ io.on("connection", (socket) => {
         lastActivity: Date.now()
       });
       
-      // Broadcast active users update
       const activeUsersInfo = Array.from(room.activeUsers.entries()).map(([userId, data]) => ({
         userId,
         username: room.users.get(userId),
@@ -89,15 +85,12 @@ io.on("connection", (socket) => {
     if (rooms.has(roomId)) {
       const room = rooms.get(roomId);
       
-      // Update file content
       room.files.set(fileName, code);
       
-      // Update user's last activity
       if (room.activeUsers.has(socket.id)) {
         room.activeUsers.get(socket.id).lastActivity = Date.now();
       }
       
-      // Broadcast to all other users in the room
       socket.to(roomId).emit("codeChange", { 
         fileName, 
         code, 
@@ -134,7 +127,6 @@ io.on("connection", (socket) => {
           Array.from(room.users.values())
         );
         
-        // Update active users
         const activeUsersInfo = Array.from(room.activeUsers.entries()).map(([userId, data]) => ({
           userId,
           username: room.users.get(userId),
@@ -166,7 +158,6 @@ io.on("connection", (socket) => {
             Array.from(room.users.values())
           );
           
-          // Update active users
           const activeUsersInfo = Array.from(room.activeUsers.entries()).map(([userId, data]) => ({
             userId,
             username: room.users.get(userId),
@@ -214,7 +205,6 @@ io.on("connection", (socket) => {
       const room = rooms.get(roomId);
       room.files.delete(fileName);
       
-      // Remove users from this file
       for (const [userId, data] of room.activeUsers.entries()) {
         if (data.fileName === fileName) {
           room.activeUsers.delete(userId);
@@ -223,7 +213,6 @@ io.on("connection", (socket) => {
       
       socket.to(roomId).emit("fileDeleted", { fileName });
       
-      // Update active users
       const activeUsersInfo = Array.from(room.activeUsers.entries()).map(([userId, data]) => ({
         userId,
         username: room.users.get(userId),
@@ -242,7 +231,6 @@ io.on("connection", (socket) => {
       room.files.delete(oldName);
       room.files.set(newName, content);
       
-      // Update active users with new filename
       for (const [userId, data] of room.activeUsers.entries()) {
         if (data.fileName === oldName) {
           data.fileName = newName;
@@ -251,7 +239,6 @@ io.on("connection", (socket) => {
       
       socket.to(roomId).emit("fileRenamed", { oldName, newName });
       
-      // Update active users
       const activeUsersInfo = Array.from(room.activeUsers.entries()).map(([userId, data]) => ({
         userId,
         username: room.users.get(userId),

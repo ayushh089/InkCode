@@ -6,7 +6,6 @@ import "react-toastify/dist/ReactToastify.css";
 import axios from "axios";
 import Editor from "../Components/editor/Editor";
 import io from "socket.io-client";
-import VideoCall from "../Components/VideoCall/VideoCall";
 import { languageOptions } from "../constants/languageOptions";
 const UserContext = React.createContext();
 const defCode = `console.log("Hello World!");`;
@@ -50,12 +49,12 @@ export function HomePage() {
     setSocket(newSocket);
 
     newSocket.on("connect", () => {
-      console.log("Connected to server");
+      // console.log("Connected to server");
       newSocket.emit("joinRoom", { roomId, username });
     });
 
     newSocket.on("disconnect", () => {
-      console.log("Disconnected from server");
+      // console.log("Disconnected from server");
     });
 
     newSocket.on("updateConnectedUsers", (users) => {
@@ -74,7 +73,6 @@ export function HomePage() {
       setMessages((prevMessages) => [...prevMessages, { msg, username, time }]);
     });
 
-    // Handle connection errors
     newSocket.on("connect_error", (error) => {
       console.error("Connection error:", error);
       showErrorToast("Connection failed. Please try again.");
