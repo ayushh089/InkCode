@@ -21,9 +21,17 @@ const LandingPage = () => {
   };
 
   return (
-    <div className="flex flex-row items-center justify-around  min-h-screen bg-gradient-to-br from-black via-gray-900 to-black p-6">
-      <div className="p-8 bg-gray-800 rounded-lg shadow-lg w-96 transform transition duration-500 hover:scale-105 mr-10">
-        <h1 className="text-3xl font-extrabold mb-6 text-center text-white">
+    <div className="flex flex-col items-center justify-start min-h-screen bg-gradient-to-br from-black via-gray-900 to-black p-4 md:p-6">
+      {/* Image at the top on mobile, right on desktop */}
+      <img 
+        src="home-img.svg" 
+        alt="code" 
+        className="w-full max-w-xs mb-8 md:mb-0 md:max-w-md md:w-[400px] md:h-[400px] lg:w-[500px] lg:h-[500px] rounded-lg shadow-lg transform transition duration-500 hover:scale-105 order-first md:order-none md:ml-6" 
+      />
+      
+      {/* Form container - below image on mobile, right on desktop */}
+      <div className="p-6 md:p-8 bg-gray-800 rounded-lg shadow-lg w-full max-w-md transform transition duration-500 hover:scale-105 order-last md:order-none">
+        <h1 className="text-2xl md:text-3xl font-extrabold mb-6 text-center text-white">
           Collaborative Code Editor
         </h1>
         <div className="space-y-6">
@@ -44,7 +52,7 @@ const LandingPage = () => {
             />
             <button
               type="submit"
-              className="w-full bg-green-600 text-white py-3 px-4 rounded-lg hover:bg-green-700 transition duration-300 ease-in-out transform hover:scale-105"
+              className="w-full bg-green-600 text-white py-2 md:py-3 px-4 rounded-lg hover:bg-green-700 transition duration-300 ease-in-out transform hover:scale-105"
             >
               Join Room
             </button>
@@ -57,7 +65,6 @@ const LandingPage = () => {
           </div>
         </div>
       </div>
-      <img src="home-img.svg" alt="code" className="w-[500px] h-[500px] ml-6  rounded-lg shadow-lg transform transition duration-500 hover:scale-105" />
     </div>
   );
 };
